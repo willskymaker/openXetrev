@@ -1,9 +1,14 @@
 """Pattern a codice Gray e decodifica: per ogni pixel di camera, quale colonna (o riga) del
 proiettore lo illumina.
 
-È la prima parte di docs/issues/03 (ricostruzione a frange). Il phase shifting per
-raffinare la posizione sotto la larghezza di una striscia NON è ancora implementato: con il
-solo codice Gray la risoluzione è una striscia.
+È la prima parte di docs/issues/03 (ricostruzione a frange).
+
+Due livelli:
+- solo codice Gray: la posizione è nota a meno di una striscia (grossolana);
+- codice Gray + phase shifting: la fase di frange sinusoidali dà la posizione sotto il pixel
+  del proiettore, il codice Gray serve solo a sapere in quale periodo ci si trova.
+
+Tutte le coordinate sono in "indici di pixel": il centro del pixel i del proiettore è i.
 
 Compromesso velocità/precisione: `bits` è un parametro. Con meno bit servono meno immagini
 (bits + 2 con i riferimenti bianco/nero), ma le strisce sono più larghe e la posizione è più
@@ -98,3 +103,95 @@ def decode_gray(images, white, black, min_contrast: float = 20.0) -> tuple[np.nd
 def code_to_coordinate(code, bits: int, size: int):
     """Coordinata del proiettore (centro della striscia) per un indice di striscia."""
     return (np.asarray(code, dtype=np.float64) + 0.5) * size / float(1 << bits)
+
+
+# ---------------------------------------------------------------------------------------
+# Phase shifting + fase assoluta
+# ---------------------------------------------------------------------------------------
+
+def gray_center_index(code, bits: int, size: int):
+    """Come `code_to_coordinate`, ma in indici di pixel (centro del pixel i = i)."""
+    return code_to_coordinate(code, bits, size) - 0.5
+
+
+def phase_shift_patterns(width: int, height: int, period_px: float, steps: int = 4,
+                         axis: str = "x") -> np.ndarray:
+    """Frange sinusoidali I_k = 0.5 + 0.5 cos(2 pi x / period + 2 pi k / steps), come uint8.
+
+    Array (steps, height, width). Più `steps`, meno sensibili al rumore; 4 è il minimo
+    comune, 3 il minimo assoluto.
+    """
+    if axis not in ("x", "y"):
+        raise ValueError("axis deve essere 'x' o 'y'")
+    if steps < 3:
+        raise ValueError("steps deve essere almeno 3")
+    if period_px < 4:
+        raise ValueError("period_px deve essere almeno 4 pixel")
+    size = width if axis == "x" else height
+    pos = np.arange(size, dtype=np.float64)
+    phi = 2.0 * np.pi * pos / float(period_px)
+    out = np.empty((steps, height, width), dtype=np.uint8)
+    for k in range(steps):
+        line = np.rint((0.5 + 0.5 * np.cos(phi + 2.0 * np.pi * k / steps)) * 255.0).astype(np.uint8)
+        out[k] = line[None, :] if axis == "x" else line[:, None]
+    return out
+
+
+def decode_phase(images, min_modulation: float = 10.0):
+    """Fase avvolta per pixel dalle immagini con frange sfasate.
+
+    Ritorna (phase, modulation, valid): fase in [0, 2 pi), ampiezza delle frange nel pixel
+    (in livelli di grigio) e maschera dei pixel con modulazione >= `min_modulation`.
+    """
+    stack = np.asarray(images, dtype=np.float64)
+    if stack.ndim != 3 or stack.shape[0] < 3:
+        raise ValueError("images deve avere forma (steps >= 3, H, W)")
+    steps = stack.shape[0]
+    delta = 2.0 * np.pi * np.arange(steps) / steps
+    s = np.tensordot(np.sin(delta), stack, axes=(0, 0))
+    c = np.tensordot(np.cos(delta), stack, axes=(0, 0))
+    phase = np.mod(np.arctan2(-s, c), 2.0 * np.pi)
+    modulation = (2.0 / steps) * np.hypot(s, c)
+    return phase, modulation, modulation >= min_modulation
+
+
+def absolute_coordinate(phase, x_gray_index, period_px: float):
+    """Coordinata assoluta del proiettore (indice di pixel) da fase avvolta e codice Gray.
+
+    Il codice Gray dà una stima grossolana x_gray; la fase la affina scegliendo il periodo
+    intero che la rende più vicina. Funziona se l'errore del codice Gray è sotto mezzo
+    periodo: usa strisce Gray larghe al massimo mezzo periodo (vedi `images_needed`).
+    """
+    frac = np.asarray(phase, dtype=np.float64) / (2.0 * np.pi)
+    n = np.rint((np.asarray(x_gray_index, dtype=np.float64) - period_px * frac) / period_px)
+    return period_px * (n + frac)
+
+
+def images_needed(size: int, period_px: float, steps: int = 4,
+                  with_references: bool = False) -> tuple[int, int]:
+    """(bit Gray, immagini totali) per una dimensione `size` del proiettore.
+
+    Le strisce Gray devono essere larghe al massimo mezzo periodo. Le immagini di riferimento
+    (bianco e nero) non servono se si usa `decode_gray_from_phase`: la media delle immagini
+    sfasate fa le veci della soglia.
+    """
+    bits = 1
+    while stripe_width_px(bits, size) > period_px / 2.0:
+        bits += 1
+        if bits > max_bits(size):
+            raise ValueError("periodo troppo piccolo per questa dimensione")
+    return bits, bits + steps + (2 if with_references else 0)
+
+
+def decode_gray_from_phase(gray_images, phase_images, min_modulation: float = 10.0):
+    """Decodifica Gray senza immagini bianco/nero, usando le immagini sfasate.
+
+    La media delle immagini sfasate è la soglia (bianco + nero) / 2 e la modulazione è
+    (bianco - nero) / 2, purché i pattern sfasati coprano l'intero intervallo 0..255.
+    Ritorna (code, valid).
+    """
+    stack = np.asarray(phase_images, dtype=np.float64)
+    _, modulation, _ = decode_phase(stack, min_modulation=min_modulation)
+    mean = stack.mean(axis=0)
+    return decode_gray(gray_images, mean + modulation, mean - modulation,
+                       min_contrast=2.0 * min_modulation)

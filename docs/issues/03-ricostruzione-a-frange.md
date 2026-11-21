@@ -5,12 +5,13 @@ Cuore dello scanner: da una sequenza di pattern proiettati e dalle due camere ca
 una nuvola di punti.
 
 ## Da fare
-- [ ] Generatore di pattern: frange sinusoidali a più frequenze (phase shifting, 4 passi) + codice
-      Gray per risolvere l'ambiguità di fase; proiezione a risoluzione nativa 1280x800 con
-      `ProjectorWindow.show_gray`.
+- [x] Generatore di pattern: frange sinusoidali (phase shifting, 4 passi) + codice Gray per
+      risolvere l'ambiguità di fase (`scanner3d/fringes.py`). Resta da fare: più frequenze e
+      la proiezione a risoluzione nativa 1280x800 con `ProjectorWindow.show_gray` (non provata).
 - [ ] Acquisizione sincronizzata: proiettare, attendere che l'immagine sia a schermo (latenza del
       proiettore), catturare da entrambe le camere. Misurare la latenza reale.
-- [ ] Decodifica: fase assoluta per pixel, maschera di qualità (modulazione).
+- [x] Decodifica: fase assoluta per pixel, maschera di qualità (modulazione), controllo di
+      coerenza Gray/fase, variante senza immagini bianco/nero. Provata solo su scena simulata.
 - [ ] Triangolazione: corrispondenze camera sinistra <-> destra tramite la fase (anche senza
       calibrare il proiettore) con `cv2.triangulatePoints`; poi variante camera <-> proiettore.
 - [ ] Nuvola di punti `open3d.geometry.PointCloud`, filtro dei punti isolati.
