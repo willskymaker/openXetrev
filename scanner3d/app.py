@@ -14,14 +14,20 @@ from PySide6.QtWidgets import (
     QMessageBox, QPushButton, QSlider, QVBoxLayout, QWidget,
 )
 
+from .calibration_panel import CalibrationPanel
 from .cameras import CameraRig
 from .projector import ProjectorWindow
 
 
-def to_pixmap(gray: np.ndarray, width: int) -> QPixmap:
-    h, w = gray.shape
-    img = QImage(np.ascontiguousarray(gray).data, w, h, w, QImage.Format_Grayscale8).copy()
-    return QPixmap.fromImage(img).scaledToWidth(width, Qt.SmoothTransformation)
+def to_pixmap(img: np.ndarray, width: int) -> QPixmap:
+    """Immagine in grigi (HxW) o a colori BGR (HxWx3)."""
+    h, w = img.shape[:2]
+    arr = np.ascontiguousarray(img)
+    if img.ndim == 2:
+        qimg = QImage(arr.data, w, h, w, QImage.Format_Grayscale8).copy()
+    else:
+        qimg = QImage(arr.data, w, h, 3 * w, QImage.Format_BGR888).copy()
+    return QPixmap.fromImage(qimg).scaledToWidth(width, Qt.SmoothTransformation)
 
 
 class CameraControls(QGroupBox):
@@ -104,9 +110,12 @@ class MainWindow(QMainWindow):
         save = QPushButton("Salva coppia di immagini")
         save.clicked.connect(self._save_pair)
 
+        self.calib = CalibrationPanel()
+
         self.controls_layout = QVBoxLayout()
         self.controls_layout.addWidget(proj_group)
         self.controls_layout.addWidget(save)
+        self.controls_layout.addWidget(self.calib)
         self.controls_layout.addStretch(1)
 
         self.status = QLabel("")
@@ -152,8 +161,10 @@ class MainWindow(QMainWindow):
         except Exception as exc:  # noqa: BLE001
             self.status.setText(f"Errore acquisizione: {exc}")
             return
-        for view, frame in zip(self.views, self.last_frames):
-            view.setPixmap(to_pixmap(frame, self.PREVIEW_W))
+        self.calib.feed(self.last_frames)
+        for cam, (view, frame) in enumerate(zip(self.views, self.last_frames)):
+            shown = self.calib.annotate(frame, cam)
+            view.setPixmap(to_pixmap(frame if shown is None else shown, self.PREVIEW_W))
 
     def _save_pair(self) -> None:
         if len(self.last_frames) < 2:
