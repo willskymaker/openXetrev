@@ -1,23 +1,31 @@
-# Distanza tra le camere regolabile: più configurazioni di calibrazione
+# Camere su un arco con distanza regolabile: più configurazioni di calibrazione
 Labels: calibrazione, ui
 
-Secondo quanto riferito dall'utente (da confermare con una misura), la distanza tra le camere
-è **regolabile, da circa 100 a 500 mm**. Il manuale parla di campi di scansione da 200, 300,
-400 e 500 mm per la testa a due camere. Ogni volta che si cambia la posizione delle camere,
-**la calibrazione stereo non vale più**: va rifatta.
+Secondo quanto riferito dall'utente (da confermare con una misura), le due camere si trovano su
+una **semicirconferenza** e la distanza tra loro è **regolabile, da circa 100 a 500 mm**, sempre
+puntate verso il centro. Il manuale parla di campi di scansione da 200, 300, 400 e 500 mm.
+
+Ogni volta che si sposta una camera **la calibrazione stereo non vale più** e va rifatta.
+Con la distanza cambia anche l'**angolo tra le camere** (da pochi gradi fino a diverse decine),
+quindi cambia quanta parte della piastra vedono entrambe.
+
+## Da misurare (quando si riassembla)
+- [ ] Raggio dell'arco / distanza delle camere dal centro (la piastra) a 100 e a 500 mm.
+- [ ] Angolo tra gli assi ottici nelle due posizioni estreme.
+- [ ] Se le camere si muovono simmetricamente o una sola.
 
 ## Conseguenze per il software
-- [ ] Salvare più calibrazioni, ognuna con un nome (es. "campo 200 mm"), non un solo
-      `calibration/stereo.json`. Oggi viene sovrascritto.
-- [ ] Nell'interfaccia: scelta della configurazione attiva e avviso se l'ultima calibrazione è
-      più vecchia dell'ultima modifica dell'hardware (o se la distanza stimata non coincide).
-- [ ] Controllo di coerenza: la distanza tra le camere ricavata dalla calibrazione (`T`) deve
-      cadere nell'intervallo 100-500 mm, altrimenti segnalare un errore.
+- [ ] **Simulazione con basi larghe**: `tools/test_calibration.py` usa 80 mm. Aggiungere scenari
+      con 100 e 500 mm su arco (camere simmetriche, toe-in fino a ~40° ciascuna) e verificare che
+      rilevamento dei marcatori L, indici e calibrazione reggano. Con angoli grandi la piastra è
+      molto scorciata in una camera: la soglia `min_common` (15 anelli) potrebbe non bastare.
+- [ ] Salvare **più calibrazioni**, ognuna con un nome (es. "campo 200 mm"): oggi
+      `calibration/stereo.json` viene sovrascritto.
+- [ ] Interfaccia: scelta della configurazione attiva; avviso se la distanza stimata dalla
+      calibrazione (`T`) non coincide con quella attesa, cioè le camere sono state mosse.
+- [ ] Controllo di coerenza: `|T|` deve cadere nell'intervallo 100-500 mm.
 - [ ] Scelta della piastra in base al campo (manuale: piccola < 150x120 mm, media fino a
-      250x200 mm, grande oltre): suggerirla in base alla calibrazione precedente.
-- [ ] Il rilevamento della piastra deve reggere anche con anelli molto piccoli (campo grande) o
-      molto grandi (campo piccolo): provare con la simulazione variando focale e distanza.
-
-## Da confermare
-Che cosa significa esattamente "variabile da 500 a 100": distanza tra le camere, distanza dalla
-piastra, o campo di scansione? Misurare e correggere questa issue e `devices/devices.json`.
+      250x200 mm, grande oltre).
+- [ ] Il rilevamento deve reggere anelli molto piccoli (campo grande) o molto grandi (campo piccolo).
+- [ ] Con basi larghe la fase delle frange è più sensibile alla geometria: tenerne conto nella
+      ricostruzione.
