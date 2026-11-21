@@ -150,7 +150,9 @@
     "tecnica": "luce strutturata, 2 camere + proiettore DMD",
     "camera_modello": "Basler a2A1920-160umPRO (USB3, Mono8, 1920x1200, sensore 1936x1216)",
     "precisione_dichiarata_mm": "0.015-0.045 (dal manuale, da verificare per il FX)",
-    "calibrazione_vendor": "file .optconf cifrato: non usato, si ricalibra da zero"
+    "calibrazione_vendor": "file .optconf cifrato: non usato, si ricalibra da zero",
+    "distanza_regolabile_mm": "100-500 (riferito dall'utente come 'variabile da 500 a 100 tra telecamere': DA CONFERMARE se è la distanza tra le camere, dalla piastra o il campo)",
+    "campi_di_scansione_manuale_mm": [200, 300, 400, 500]
   },
   "immagini_riferimento": "tests/data/plate_cam0.png, plate_cam1.png (piastra, proiettore bianco, esposizione 12 ms, guadagno 0)"
 }
