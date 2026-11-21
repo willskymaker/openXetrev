@@ -1,0 +1,156 @@
+{
+  "salvato_il": "2026-11-21 18:33",
+  "nota": "Dati hardware dello scanner COPYT3D FX, salvati per sviluppare senza averlo a disposizione. Non contiene numeri di serie, esposizioni o guadagni (quelli dipendono dall'uso).",
+  "camere": [
+    {
+      "indice": 0,
+      "ruolo": "sinistra",
+      "nota_ordine": "ordinate per numero di serie crescente (CameraRig)",
+      "DeviceModelName": "a2A1920-160umPRO",
+      "DeviceVendorName": "Basler",
+      "DeviceFirmwareVersion": "p=vu3p_imx392m_pro/s=r/v=2.0.3/i=5121.28/h=ba69dd2",
+      "SensorWidth": 1936,
+      "SensorHeight": 1216,
+      "Width": 1920,
+      "Height": 1200,
+      "OffsetX": 8,
+      "OffsetY": 8,
+      "BinningHorizontal": 1,
+      "BinningVertical": 1,
+      "PixelFormat": "Mono8",
+      "ExposureAuto": "Off",
+      "GainAuto": "Off",
+      "BlackLevel": 0.0,
+      "Gamma": 1.0,
+      "TriggerMode": "Off",
+      "TriggerSource": "Software",
+      "AcquisitionFrameRateEnable": false,
+      "AcquisitionFrameRate": 100.0,
+      "AcquisitionMode": "Continuous",
+      "DeviceLinkThroughputLimitMode": "On",
+      "DeviceLinkThroughputLimit": 360000000,
+      "UserSetSelector": "Default",
+      "UserSetDefault": "Default",
+      "PixelSize": "Bpp8",
+      "LineSelector": "Line1",
+      "_usb": "BaslerUsb"
+    },
+    {
+      "indice": 1,
+      "ruolo": "destra",
+      "nota_ordine": "ordinate per numero di serie crescente (CameraRig)",
+      "DeviceModelName": "a2A1920-160umPRO",
+      "DeviceVendorName": "Basler",
+      "DeviceFirmwareVersion": "p=vu3p_imx392m_pro/s=r/v=2.0.3/i=5121.28/h=ba69dd2",
+      "SensorWidth": 1936,
+      "SensorHeight": 1216,
+      "Width": 1920,
+      "Height": 1200,
+      "OffsetX": 8,
+      "OffsetY": 8,
+      "BinningHorizontal": 1,
+      "BinningVertical": 1,
+      "PixelFormat": "Mono8",
+      "ExposureAuto": "Off",
+      "GainAuto": "Off",
+      "BlackLevel": 0.0,
+      "Gamma": 1.0,
+      "TriggerMode": "Off",
+      "TriggerSource": "Software",
+      "AcquisitionFrameRateEnable": false,
+      "AcquisitionFrameRate": 100.0,
+      "AcquisitionMode": "Continuous",
+      "DeviceLinkThroughputLimitMode": "On",
+      "DeviceLinkThroughputLimit": 360000000,
+      "UserSetSelector": "Default",
+      "UserSetDefault": "Default",
+      "PixelSize": "Bpp8",
+      "LineSelector": "Line1",
+      "_usb": "BaslerUsb"
+    }
+  ],
+  "proiettore": {
+    "modello": "Dell M318WL",
+    "collegamento": "HDMI, visto da Windows come secondo monitor",
+    "risoluzione": [
+      1280,
+      800
+    ],
+    "frequenza_hz": 60.0,
+    "dimensione_fisica_mm": [
+      339.0,
+      212.0
+    ],
+    "indice_schermo_windows": 1,
+    "nota": "Proiettore DLP (DMD). Vertex Pro usa un tempo di riscaldamento di 60 s (prjWarmupTime)."
+  },
+  "tavola_rotante": {
+    "collegamento": "USB, convertitore FTDI (VID 0403, PID 6001)",
+    "porta_seriale": {
+      "baud": 115200,
+      "bit_dati": 8,
+      "parita": "nessuna",
+      "bit_stop": 1,
+      "controllo_flusso": "nessuno",
+      "latency_timer_ms": 16
+    },
+    "protocollo": "SCONOSCIUTO: da ricavare osservando la comunicazione di Vertex Pro (non inviare comandi a caso: la tavola si muove).",
+    "parametri_vertex_pro": {
+      "tableStep_gradi": 30,
+      "tableSpeed": 2,
+      "tablePositions": 8,
+      "tablePositionsTilt": 2,
+      "tiltingAngle": 0,
+      "tableLimY1": -30,
+      "tableLimY2": 30,
+      "FindHomeBeforeScan": true,
+      "scanDelay_s": 2,
+      "scanNum": 2
+    }
+  },
+  "piastre_calibrazione": {
+    "nota": "Dai file masters/*.xml di Vertex Pro. Anelli su griglia regolare, z = 0. Tre marcatori grandi a L (rami da 1 e 2 passi) fissano origine e orientamento.",
+    "SmallField": {
+      "griglia_ij": [
+        20,
+        20
+      ],
+      "centro_ij": [
+        9,
+        10
+      ],
+      "passo_mm": 5.0
+    },
+    "MediumField": {
+      "griglia_ij": [
+        26,
+        19
+      ],
+      "centro_ij": [
+        12,
+        8
+      ],
+      "passo_mm": 7.5
+    },
+    "BigField": {
+      "griglia_ij": [
+        26,
+        19
+      ],
+      "centro_ij": [
+        12,
+        8
+      ],
+      "passo_mm": 15.0
+    },
+    "piastra_in_uso": "MediumField (passo 7,5 mm): coerente con distanza ~240 mm e focale ~3200 px"
+  },
+  "scanner": {
+    "modello": "Open Tech 3D COPYT3D FX",
+    "tecnica": "luce strutturata, 2 camere + proiettore DMD",
+    "camera_modello": "Basler a2A1920-160umPRO (USB3, Mono8, 1920x1200, sensore 1936x1216)",
+    "precisione_dichiarata_mm": "0.015-0.045 (dal manuale, da verificare per il FX)",
+    "calibrazione_vendor": "file .optconf cifrato: non usato, si ricalibra da zero"
+  },
+  "immagini_riferimento": "tests/data/plate_cam0.png, plate_cam1.png (piastra, proiettore bianco, esposizione 12 ms, guadagno 0)"
+}
