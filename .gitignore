@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+# Output di test e scansioni: contengono screenshot e dati locali
+probe_out/
+captures/
+# Calibrazioni e configurazioni dello scanner (specifiche del tuo hardware)
+*.optconf
+calibration/
