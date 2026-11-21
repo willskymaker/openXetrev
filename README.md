@@ -7,6 +7,11 @@ Stato: in sviluppo. Per ora c'è l'anteprima delle camere (esposizione e guadagn
 camera), il controllo del proiettore e il salvataggio di coppie di immagini.
 Calibrazione e ricostruzione 3D sono da fare.
 
+Senza hardware sono già disponibili e testati: il modulo tavola rotante con simulatore
+(`scanner3d/turntable.py`, il backend seriale reale non invia comandi finché il protocollo
+non è noto) e i pattern a codice Gray con decodifica (`scanner3d/fringes.py`, senza phase
+shifting). Risorse utili: `docs/risorse.md`.
+
 ## Avvio
 
 ```
