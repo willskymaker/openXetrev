@@ -158,6 +158,12 @@ check("distanza tra le camere entro 0,5%", abs(res.baseline_mm / base_true - 1) 
       f"{res.baseline_mm:.2f} vs {base_true:.2f} mm")
 ang = np.degrees(np.arccos(np.clip((np.trace(res.R @ Rs.T) - 1) / 2, -1, 1)))
 check("rotazione tra le camere entro 0,2 gradi", ang < 0.2, f"{ang:.3f} gradi")
+ang_true = np.degrees(al)                       # toe-in della camera 1 rispetto alla 0
+rad_true = 80.0 / (2 * np.sin(al / 2))          # raggio dell'arco equivalente
+check("angolo tra le camere entro 0,2 gradi", abs(res.angle_deg - ang_true) < 0.2,
+      f"{res.angle_deg:.2f} vs {ang_true:.2f}")
+check("raggio dell'arco entro 1%", abs(res.arc_radius_mm / rad_true - 1) < 0.01,
+      f"{res.arc_radius_mm:.1f} vs {rad_true:.1f} mm")
 check("errore di riproiezione < 0,4 px", max(res.rms0, res.rms1, res.rms_stereo) < 0.4,
       f"{res.rms0:.3f} / {res.rms1:.3f} / {res.rms_stereo:.3f}")
 

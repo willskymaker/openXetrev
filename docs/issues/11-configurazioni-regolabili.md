@@ -9,10 +9,13 @@ Ogni volta che si sposta una camera **la calibrazione stereo non vale più** e v
 Con la distanza cambia anche l'**angolo tra le camere** (da pochi gradi fino a diverse decine),
 quindi cambia quanta parte della piastra vedono entrambe.
 
-## Da misurare (quando si riassembla)
-- [ ] Raggio dell'arco / distanza delle camere dal centro (la piastra) a 100 e a 500 mm.
-- [ ] Angolo tra gli assi ottici nelle due posizioni estreme.
-- [ ] Se le camere si muovono simmetricamente o una sola.
+## Geometria dell'arco
+Il raggio non si può misurare a mano: **si ricava dalla calibrazione**. Il riepilogo
+(`CalibrationResult.summary()`) riporta distanza tra le camere, angolo tra gli assi ottici e
+raggio dell'arco equivalente (corda / 2 sin(angolo/2)).
+- [ ] Calibrare a 100 e a 500 mm e annotare in `devices/devices.json` i valori ricavati.
+- [ ] Verificare se le camere si muovono simmetricamente o una sola (dalla posa della piastra
+      rispetto a ciascuna camera).
 
 ## Conseguenze per il software
 - [ ] **Simulazione con basi larghe**: `tools/test_calibration.py` usa 80 mm. Aggiungere scenari

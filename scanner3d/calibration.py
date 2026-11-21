@@ -176,9 +176,23 @@ class CalibrationResult:
     def baseline_mm(self) -> float:
         return float(np.linalg.norm(self.T))
 
+    @property
+    def angle_deg(self) -> float:
+        """Angolo tra gli assi ottici delle due camere."""
+        c = (np.trace(self.R) - 1.0) / 2.0
+        return float(np.degrees(np.arccos(np.clip(c, -1.0, 1.0))))
+
+    @property
+    def arc_radius_mm(self) -> float:
+        """Raggio dell'arco su cui stanno le camere (puntate al centro): corda / (2 sin(angolo/2))."""
+        a = np.radians(self.angle_deg)
+        return float(self.baseline_mm / (2 * np.sin(a / 2))) if a > 1e-3 else float("inf")
+
     def summary(self) -> str:
         return (f"{self.n_poses} pose | errore camere {self.rms0:.3f} / {self.rms1:.3f} px | "
-                f"errore stereo {self.rms_stereo:.3f} px | distanza tra le camere {self.baseline_mm:.1f} mm")
+                f"errore stereo {self.rms_stereo:.3f} px | distanza tra le camere "
+                f"{self.baseline_mm:.1f} mm | angolo {self.angle_deg:.1f}° | "
+                f"raggio dell'arco {self.arc_radius_mm:.0f} mm")
 
     def to_json(self) -> dict:
         return {
